@@ -1,0 +1,7 @@
+extends layout
+
+block content
+    
+    each livecontest in livecontests 
+        a(href="")
+            button(type="button" style="display:block;margin-top:10px;")=livecontest.name

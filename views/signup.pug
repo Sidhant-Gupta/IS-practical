@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  img(src='images/login_pic.jpg' alt='Login Pic' style='width:250px;height:100px;margin:auto;display:block')
+  div(style='margin:auto;display:block;width:150px')
+    form(method='POST')
+      | Username:
+      br
+      input(type='text' name='username' placeholder='New Username')
+      br
+      br
+      | Password:
+      br
+      input(type='password' name='password' placeholder='Create Password')
+      br
+      br
+      br
+      input(type='submit' value='Sign Up' style='margin-left:35px;width:100px')
+    p(style='margin-top:50px;margin-left:30px') Already Member?  
+    a(href='http://localhost:3000/login')
+        button(style='margin-left:40px;width:100px') Sign In
+    ul
+      each error in errors 
+        li(style='width:500px;margin-left:-30px')=error.error   
+
+
+  

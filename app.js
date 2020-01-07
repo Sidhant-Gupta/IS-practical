@@ -32,9 +32,12 @@ function app_route()
    app.get('/login',function(req,res){routing.get_login(req,res);});
    app.post('/login',function(req,res){routing.post_login(req,res);});
 
-   app.get('/livecontests',function(req,res){routing.get_livecontests(req,res)});
+   app.get('/livecontests',function(req,res){routing.get_livecontests(req,res);});
 
-   app.get('/logout',function(req,res){routing.get_logout(req,res)});
+   app.get('/contest/:contest_id',function(req,res){routing.get_contest(req,res);});
+
+   app.get('/logout',function(req,res){routing.get_logout(req,res);});
+
 }
 
 

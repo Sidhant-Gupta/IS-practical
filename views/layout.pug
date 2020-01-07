@@ -8,6 +8,7 @@ html
     br
     hr
     footer
-        a(href='http://localhost:3000/logout')
-          button(style='margin-left:40px;width:100px') Sign Out
+        if user_info
+          a(href='http://localhost:3000/logout')
+            button(style='width:100px') Sign Out
         p OK &copy; Sphere Online Judge 2020

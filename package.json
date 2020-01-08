@@ -1,7 +1,6 @@
 {
   "name": "express-test",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "start": "nodemon ./app.js",
@@ -20,5 +19,14 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Winzogames/OnlineJudge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Winzogames/OnlineJudge/issues"
+  },
+  "homepage": "https://github.com/Winzogames/OnlineJudge#readme",
+  "description": ""
 }

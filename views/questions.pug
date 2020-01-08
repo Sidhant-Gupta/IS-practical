@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h1(style='margin-left:500px;')='Welcome '+user_info.username
+    h2(style='margin-left:500px;')="Contest id:"+contest_info.id+" Name: "+contest_info.name+" Duration:"+contest_info.duration
+    each question in questions 
+        -var id="http://localhost:3000/contest/"+contest_info.id+"/"+question.id
+        a(href=id)
+            button(type="button" style="display:block;margin-top:10px;")=question.name

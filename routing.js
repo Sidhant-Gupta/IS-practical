@@ -81,17 +81,41 @@ function get_livecontests(req,res)
         if(db_err)res.render('error404');
         else 
         {
-            let livecontests=db_res.rows;
             let user_info=req.cookies.user_info;
+            let livecontests=db_res.rows;
             res.render('livecontests',{livecontests:livecontests,user_info:user_info});
         }
     });    
 }
-     
-function get_contest(req,res)
+
+async function get_contest(req,res)
 {
-    let contest_id=req.params.contest_id;    
-    res.send('Information For Contest '+contest_id);
+    let contest_id=req.params.contest_id;
+    try
+    {
+        let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
+        if(contest_info.rows.length==0)throw exception;
+        else
+        {
+            let q_ids_query=await db_client.query("select question_id from contest_question where contest_id=$1",[contest_id]);
+            let q_ids=[];
+            for(let i=0;i<q_ids_query.rows.length;i++){q_ids.push(q_ids_query.rows[i].question_id);};
+
+            let user_info=req.cookies.user_info;
+            contest_info=contest_info.rows[0];
+            let questions=await db_client.query("select * from questions_table where id=any($1)",[q_ids]);
+            questions=questions.rows;
+            //console.log(user_info);
+            //console.log(contest_info.rows);
+            //console.log(questions.rows);
+            res.render('questions',{user_info:user_info,contest_info:contest_info,questions:questions});
+        }
+    }
+    catch(e)
+    {
+        console.log(e); 
+    }
+     
 }
 
 function get_logout(req,res)
@@ -103,3 +127,20 @@ function get_logout(req,res)
         
     
 
+// async function get_contest_q1()
+// {
+//     return new Promise((resolve, reject) => {
+//         let res={};
+//     db_client.query("select * from user_registeration",function(db_err,db_res)
+//     {
+//         if(!db_err)
+//         {
+//             console.log('Here');
+//             res=db_res.rows;
+//             resolve(res);
+//         } else {
+//             reject(db_err);
+//         }
+//     });
+//     });
+// }

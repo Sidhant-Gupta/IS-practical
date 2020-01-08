@@ -86,7 +86,7 @@ function app_route()
       if(check_login(req,res))next();
       else res.redirect('/login');
    }
-   ,function(req,res){routing.get_contest(req,res);});
+   ,async function(req,res){routing.get_contest(req,res);});
 
    app.get('/logout',function(req,res){routing.get_logout(req,res);});
 

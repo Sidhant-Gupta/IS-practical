@@ -48,11 +48,7 @@ function post_signup(req,res)
     });
 }
 
-function get_login(req, res) 
-{
-    if(req.cookies.user_info)res.render('login',{errors:{},user_info:req.cookies.user_info});
-    else res.render('login',{errors:{}});
-}
+function get_login(req, res) {res.render('login',{errors:{}});}
 
 function post_login(req,res)
 {
@@ -84,31 +80,22 @@ function post_login(req,res)
 
 function get_livecontests(req,res)
 {
-    if(req.cookies.user_info)
+    db_client.query("select * from live_contests",function(db_err,db_res)
     {
-        db_client.query("select * from live_contests",function(db_err,db_res)
+        if(db_err)res.render('error404');
+        else 
         {
-            if(db_err)res.render('error404');
-            else 
-            {
-                let livecontests=db_res.rows;
-                let user_info=req.cookies.user_info;
-                res.render('livecontests',{livecontests:livecontests,user_info:user_info});
-            }
-        });
-        
-    }
-    else res.redirect('/login');
+            let livecontests=db_res.rows;
+            let user_info=req.cookies.user_info;
+            res.render('livecontests',{livecontests:livecontests,user_info:user_info});
+        }
+    });    
 }
      
 function get_contest(req,res)
 {
-    if(req.cookies.user_info)
-    {
-        let contest_id=req.params.contest_id;
-        res.send('Information For Contest '+contest_id);
-    }
-    else redirect('/login');
+    let contest_id=req.params.contest_id;
+    res.send('Information For Contest '+contest_id);
 }
 
 function get_logout(req,res)

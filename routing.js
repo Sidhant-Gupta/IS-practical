@@ -1,6 +1,6 @@
 const path=require('path').join(__dirname+'/views/');
 const pg=require('pg');
-const database_connection_info = "postgres://admin_rajat:sql_root@localhost:5432/temp_online_judge";
+const database_connection_info = "postgres://admin_rajat:sql_root@localhost:5432/online_judge";
 const db_client= new pg.Client(database_connection_info);
 const jwt = require('jsonwebtoken');
 const jwt_secret_key='admin_rajat'
@@ -17,11 +17,7 @@ module.exports=
     get_contest:get_contest
 }
 
-function get_signup(req,res)
-{
-    if(req.cookies.user_info)res.redirect('/livecontests');
-    else res.render('signup',{errors:{}});
-}
+function get_signup(req,res){res.render('signup',{errors:{}});}
 
 function post_signup(req,res)
 {

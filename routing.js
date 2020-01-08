@@ -1,6 +1,6 @@
 const path=require('path').join(__dirname+'/views/');
 const pg=require('pg');
-const database_connection_info = "postgres://admin_rajat:sql_root@localhost:5432/online_judge";
+const database_connection_info = "postgres://admin_rajat:sql_root@localhost:5432/temp_online_judge";
 const db_client= new pg.Client(database_connection_info);
 const jwt = require('jsonwebtoken');
 const jwt_secret_key='admin_rajat'
@@ -14,7 +14,8 @@ module.exports=
     post_login:post_login,
     get_livecontests:get_livecontests,
     get_logout:get_logout,
-    get_contest:get_contest
+    get_contest:get_contest,
+    get_error:get_error
 }
 
 function get_signup(req,res)
@@ -106,11 +107,35 @@ function get_contest(req,res)
     if(req.cookies.user_info)
     {
         let contest_id=req.params.contest_id;
-        res.send('Information For Contest '+contest_id);
+        db_client.query("select question_id from contest_question where contest_id=$1",[contest_id],function(db_err,db_res)
+        {
+            if(db_err)res.render('error404');
+            else
+            {
+                if(db_res.rows.length==0)res.render('error404');
+                else
+                {
+                    let q_ids=[];for(let i=0;i<db_res.rows.length;i++)q_ids.push(db_res.rows[i].question_qid);
+                    db_client.query("select * from questions_table where id=any($1)",[q_ids],function(db_err,db_res)
+                    {
+                        if(db_err)res.render('error404');
+                        else
+                        {
+
+                        }
+                    });
+                }
+            }
+        });
+
     }
-    else redirect('/login');
+    
 }
 
+function get_error(req,res)
+{
+    res.render('error404');
+}
 function get_logout(req,res)
 {
     res.clearCookie('user_info');

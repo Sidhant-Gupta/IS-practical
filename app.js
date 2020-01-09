@@ -88,6 +88,30 @@ function app_route()
    }
    ,async function(req,res){routing.get_contest(req,res);});
 
+   app.get('/contest/:contest_id/questions'
+   ,function(req,res,next)
+   {
+      if(check_login(req,res))next();
+      else res.redirect('/login');
+   }
+   ,async function(req,res){routing.get_start_contest(req,res);});
+
+   app.get('/contest/:contest_id/questions/:question_id'
+   ,function(req,res,next)
+   {
+      if(check_login(req,res))next();
+      else res.redirect('/login');
+   }
+   ,async function(req,res){routing.get_contest_question(req,res);});
+
+   app.get('/contest/:contest_id/questions/:question_id/submit'
+   ,function(req,res,next)
+   {
+      if(check_login(req,res))next();
+      else res.redirect_login('/login');
+   }
+   ,async function(req,res){routing.get_submit_contest_question(req,res);});
+
    app.get('/logout',function(req,res){routing.get_logout(req,res);});
 
 }

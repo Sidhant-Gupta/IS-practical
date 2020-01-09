@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    h1(style='margin-left:500px;')='Welcome '+user_info.username
+    h2(style='margin-left:400px;')="Contest id:"+contest_info.id+" Name: "+contest_info.name+" Duration:"+contest_info.duration
+    br
+    br
+    h3(style='margin-left:20px')=question_info.name+" "+question_info.level
+    p(style='margin-left:20px')=question_info.question
+    br
+    br
+    -var id="http://localhost:3000/contest/"+contest_info.id+"/questions/"+question_info.id+"/submit"
+        a(href=id)
+            button(type="button" style="display:block;margin-top:10px;margin-left:20px") Submit

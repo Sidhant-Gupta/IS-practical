@@ -17,7 +17,7 @@ module.exports=
     get_contest:get_contest,
     get_start_contest:get_start_contest,
     get_contest_question:get_contest_question,
-    get_submit_contest_question:get_submit_contest_question
+    post_contest_question:post_contest_question
 }
 
 function get_signup(req,res){res.render('signup',{errors:{}});}
@@ -152,10 +152,11 @@ async function get_contest_question(req,res)
         if(valid_user.rows.length!=1)throw exception;//CHECK TIME TOKEN
         else
         {
-            let question_info=await db_client.query("select * from questions_table where id=$1",[question_id]);
-            if(question_info.rows.length==0)throw exception;
+            let valid_question=await db_client.query("select * from contest_question where contest_id=$1 and question_id=$2",[contest_id,question_id]);
+            if(valid_question.rows.length!=1)throw exception;
             else
             {
+                let question_info=await db_client.query("select * from questions_table where id=$1",[question_id]);
                 question_info=question_info.rows[0];
                 let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
                 contest_info=contest_info.rows[0];
@@ -166,22 +167,16 @@ async function get_contest_question(req,res)
     catch(e){res.render('error404');}
 }
 
-async function get_submit_contest_question(req,res)
+async function post_contest_question(req,res)
 {
     try
     {
-        let user_info=req.cookies.user_info;
-        let contest_id=req.params.contest_id;  
-        let question_id=req.params.question_id;
-        let valid_user=await db_client.query("select user_id from contests_users where user_id=$1 and contest_id=$2",[user_info.id,contest_id]);
-        if(valid_user.rows.length!=1)throw exception;//CHECK TIME TOKEN
-        else
-        {
-            
-        }
+
     }
     catch(e){res.render('error404');}
 }
+
+
 
 function get_logout(req,res)
 {

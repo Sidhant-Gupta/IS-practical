@@ -3,7 +3,9 @@ const pg=require('pg');
 const database_connection_info = "postgres://admin_rajat:sql_root@localhost:5432/temp_online_judge";
 const db_client= new pg.Client(database_connection_info);
 const jwt = require('jsonwebtoken');
-const jwt_secret_key='admin_rajat'
+const jwt_secret_key='admin_rajat';
+const axios=require('axios');
+
 db_client.connect();
 
 module.exports=
@@ -160,7 +162,7 @@ async function get_contest_question(req,res)
                 question_info=question_info.rows[0];
                 let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
                 contest_info=contest_info.rows[0];
-                res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info});
+                res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:{}});
             }
         }
     }
@@ -171,7 +173,59 @@ async function post_contest_question(req,res)
 {
     try
     {
+        let user_info=req.cookies.user_info;
+        let contest_id=req.params.contest_id;  
+        let question_id=req.params.question_id;
+        let valid_question=await db_client.query("select * from contest_question where contest_id=$1 and question_id=$2",[contest_id,question_id]);
+        if(valid_question.rows.length!=1)throw exception;
+        else
+        {
+            db_client.query("begin");
 
+            let source_code=req.body.source_code;
+            let test_case=await db_client.query("select * from question_input_output where question_id=$1",[question_id]);
+            let input=test_case.rows[0].input;
+            let output=test_case.rows[0].output;
+            let compiler={source_code:source_code,std_in:input,expected_output:output,language_id:48};
+
+            let question_info=await db_client.query("select * from questions_table where id=$1",[question_id]);
+            question_info=question_info.rows[0];
+            let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
+            contest_info=contest_info.rows[0];
+
+            axios
+            ({
+                method: 'post',
+                url:'https://api.judge0.com/submissions',
+                headers: { 'Content-Type': 'application/JSON' },
+                data:compiler
+            })
+            .then
+            (function(response)
+            {
+                axios
+                ({
+                    method: 'get',
+                    url:'https://api.judge0.com/submissions/'+response.data.token,
+                })
+                .then
+                (function(response)
+                {
+                    let result=response.data.status.description;
+                    res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:result})
+                })
+                .catch
+                (error =>
+                {
+                    res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:'ERROR IN CODE'})
+                }); 
+            })
+            .catch
+            (error => 
+            {
+                res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:'SERVER ERROR'})
+            });
+        }
     }
     catch(e){res.render('error404');}
 }

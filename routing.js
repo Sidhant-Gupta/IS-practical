@@ -19,7 +19,9 @@ module.exports=
     get_contest:get_contest,
     get_start_contest:get_start_contest,
     get_contest_question:get_contest_question,
-    post_contest_question:post_contest_question
+    post_contest_question:post_contest_question,
+    get_contest_submissions:get_contest_submissions,
+    get_contest_leaderboard:get_contest_leaderboard
 }
 
 function get_signup(req,res){res.render('signup',{errors:{}});}
@@ -128,7 +130,7 @@ async function get_start_contest(req,res)
         else
         {
             await db_client.query("begin");
-            await db_client.query("insert into contests_users(user_id,contest_id,enter_time) values($1,$2,$3)",[user_info.id,contest_id,new Date()]);
+            if(valid_user.rows.length==0){await db_client.query("insert into contests_users(user_id,contest_id,enter_time) values($1,$2,$3)",[user_info.id,contest_id,new Date()]);}
 
             let q_ids_query=await db_client.query("select question_id from contest_question where contest_id=$1",[contest_id]);
             let q_ids=[];
@@ -153,7 +155,10 @@ async function get_contest_question(req,res)
         let contest_id=req.params.contest_id;  
         let question_id=req.params.question_id;
         let valid_user=await db_client.query("select user_id from contests_users where user_id=$1 and contest_id=$2",[user_info.id,contest_id]);
-        if(valid_user.rows.length!=1)throw exception;//CHECK TIME TOKEN
+        let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
+        contest_info=contest_info.rows[0];
+        if(valid_user.rows.length!=1)throw exception;
+        else if(check_time(valid_user.rows[0].enter_time,contest_info.duration))throw exception;
         else
         {
             let valid_question=await db_client.query("select * from contest_question where contest_id=$1 and question_id=$2",[contest_id,question_id]);
@@ -162,8 +167,6 @@ async function get_contest_question(req,res)
             {
                 let question_info=await db_client.query("select * from questions_table where id=$1",[question_id]);
                 question_info=question_info.rows[0];
-                let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
-                contest_info=contest_info.rows[0];
                 res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:" "});
             }
         }
@@ -179,7 +182,10 @@ async function post_contest_question(req,res)
         let contest_id=req.params.contest_id;  
         let question_id=req.params.question_id;
         let valid_question=await db_client.query("select * from contest_question where contest_id=$1 and question_id=$2",[contest_id,question_id]);
-        if(valid_question.rows.length!=1)throw exception;
+        let valid_user=await db_client.query("select user_id from contests_users where user_id=$1 and contest_id=$2",[user_info.id,contest_id]);
+        if(valid_user.rows.length!=1)throw exception;
+        else if(check_time(valid_user.rows[0].enter_time,contest_info.duration))throw exception;
+        else if(valid_question.rows.length!=1)throw exception;
         else
         {
             db_client.query("begin");
@@ -195,7 +201,7 @@ async function post_contest_question(req,res)
             let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
             contest_info=contest_info.rows[0];
 
-            axios
+            await axios
             ({
                 method: 'post',
                 url:'https://api.judge0.com/submissions',
@@ -205,7 +211,7 @@ async function post_contest_question(req,res)
             .then
             (async function(response)
             {
-                axios
+                await axios
                 ({
                     method: 'get',
                     url:'https://api.judge0.com/submissions/'+response.data.token,
@@ -244,10 +250,51 @@ async function post_contest_question(req,res)
     catch(e){res.render('error404');}
 }
 
+async function get_contest_submissions(req,res)
+{
+    try
+    {
+        let contest_id=req.params.contest_id; 
+        let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
+        if(contest_info.rows.length==0)throw exception;
+        else
+        {
+            let contest_submissions={};
+            let submission_type=req.params.submission_type;
+            if(submission_type==1)contest_submissions=await db_client.query("select user_id,username,question_id,score from user_registeration inner join submissions on user_registeration.id=submissions.user_id where contest_id=$1;",[contest_id]);
+            else if(submission_type==2)
+            {
+                let user_id=req.cookies.user_info.id;
+                contest_submissions=await db_client.query("select user_id,username,question_id,score from user_registeration inner join submissions on user_registeration.id=submissions.user_id where contest_id=$1 and user_id=$2;",[contest_id,user_id]);
+            }
+            else throw exception;
+            res.render('submissions',{contest_submissions:contest_submissions.rows,contest_info:contest_info.rows[0]});
+        }
+    }
+    catch(e){res.render('error404');}
+}
+
+
+async function get_contest_leaderboard(req,res)
+{
+    try
+    {
+        
+        let contest_id=req.params.contest_id; 
+        let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
+        if(contest_info.rows.length==0)throw exception;
+        else
+        {
+            let leaderboard=await db_client.query("select user_id,count(score) from (select distict (user_id,question_id,score) from submissions where score='Accepted' AND contest_id=$1)as foo group by user_id order by count desc",[contest_id]);
+            console.log(leaderboard.rows);
+        }
+    }
+    catch(e){console.log(e);res.render('error404');}
+}
 function check_time(user_time,contest_duration)
 {
     let diff=(Date.now()-user_time)/(1000*60*60);
-    if(diff>contest_duration-10)return true;
+    if(diff>contest_duration)return true;
     return false;
 }
 

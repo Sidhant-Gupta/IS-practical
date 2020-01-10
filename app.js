@@ -112,6 +112,22 @@ function app_route()
   }
   ,async function(req,res){routing.post_contest_question(req,res);})
 
+   app.get('/contest/:contest_id/submissions/:submission_type'
+   ,function(req,res,next)
+   {
+      if(check_login(req,res))next();
+      else res.redirect('/login');  
+   }
+   ,async function(req,res){routing.get_contest_submissions(req,res);});
+
+   app.get('/contest/:contest_id/leaderboard'
+   ,function(req,res,next)
+   {
+      if(check_login(req,res))next();
+      else res.redirect('/login');
+   }
+   ,async function(req,res){routing.get_contest_leaderboard(req,res);});
+
    app.get('/logout',function(req,res){routing.get_logout(req,res);});
 
 }

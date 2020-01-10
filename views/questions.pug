@@ -3,7 +3,12 @@ extends layout
 block content
     h1(style='margin-left:500px;')='Welcome '+user_info.username
     h2(style='margin-left:500px;')="Contest id:"+contest_info.id+" Name: "+contest_info.name+" Duration:"+contest_info.duration
+    a(href="http://localhost:3000/contest/"+contest_info.id+"/submissions/1")
+        button(type="button" style="display:block;margin-top:10px;margin-left:1100px;") Submissions
+    a(href="http://localhost:3000/contest/"+contest_info.id+"/submissions/2")
+        button(type="button" style="display:block;margin-top:10px;margin-left:1100px;") My Submissions   
+
     each question in questions 
         -var id="http://localhost:3000/contest/"+contest_info.id+"/questions/"+question.id
         a(href=id)
-            button(type="button" style="display:block;margin-top:10px;")=question.name
+            button(type="button" style="display:block;margin-top:10px;")=question.name+" "+question.level

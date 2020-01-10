@@ -5,4 +5,4 @@ block content
     each livecontest in livecontests 
         -var id="http://localhost:3000/contest/"+livecontest.id
         a(href=id)
-            button(type="button" style="display:block;margin-top:10px;")=livecontest.name
+            button(type="button" style="display:block;margin-top:10px;")=livecontest.name+" Hours: "+livecontest.duration

@@ -1,0 +1,28 @@
+extends layout
+
+block content
+    h2(style='margin-left:400px;margin-top:20px;')="Contest id:"+contest_info.id+" Name: "+contest_info.name+" Duration:"+contest_info.duration 
+    h1(style='margin-left:550px;margin-top:50px;') Submissions
+    br
+    br
+    table(style="border-collapse:collapse;width:100%;font-family:arial,sans-serif")
+        each contest_submission in contest_submissions
+            if contest_submission.score=='Accepted'
+                tr(style="background-color:#46ff46")
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.user_id
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.username
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.question_id
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.score
+            else if contest_submission.score=='Wrong Answer'
+                tr(style="background-color:#ff3b2a")
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.user_id
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.username
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.question_id
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.score
+            else         
+                tr(style="background-color:#ff901f")
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.user_id
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.username
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.question_id
+                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.score
+            

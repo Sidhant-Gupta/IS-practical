@@ -1,0 +1,18 @@
+extends layout
+
+block content
+    h2(style='margin-left:400px;margin-top:20px;')="Contest id:"+contest_info.id+" Name: "+contest_info.name+" Duration:"+contest_info.duration 
+    h1(style='margin-left:550px;margin-top:50px;') Leaderboard
+    br
+    br
+    table(style="border-collapse:collapse;width:100%;font-family:arial,sans-serif;border:2px solid black")
+        -var rank=0
+        each contest_rank in contest_ranks
+            -rank++
+            tr
+                td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=rank
+                td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_rank.user_id
+                td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_rank.username
+                td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_rank.countx
+            
+        

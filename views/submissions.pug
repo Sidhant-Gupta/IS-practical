@@ -6,23 +6,18 @@ block content
     br
     br
     table(style="border-collapse:collapse;width:100%;font-family:arial,sans-serif")
+        -var colorx="black"
         each contest_submission in contest_submissions
             if contest_submission.score=='Accepted'
-                tr(style="background-color:#46ff46")
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.user_id
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.username
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.question_id
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.score
+                -colorx="#46ff46"
             else if contest_submission.score=='Wrong Answer'
-                tr(style="background-color:#ff3b2a")
+                -colorx="#ff3b2a"    
+            else 
+                -colorx="#ff8c00"    
+            tr(style="background-color:"+colorx)
                     td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.user_id
                     td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.username
                     td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.question_id
                     td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.score
-            else         
-                tr(style="background-color:#ff901f")
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.user_id
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.username
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.question_id
-                    td(style="border:1px solid #dddddd;text-align:left;padding:8px;")=contest_submission.score
+                
             

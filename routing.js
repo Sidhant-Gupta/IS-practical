@@ -285,8 +285,12 @@ async function get_contest_leaderboard(req,res)
         if(contest_info.rows.length==0)throw exception;
         else
         {
-            let leaderboard=await db_client.query("select user_id,count(score) from (select distict (user_id,question_id,score) from submissions where score='Accepted' AND contest_id=$1)as foo group by user_id order by count desc",[contest_id]);
-            console.log(leaderboard.rows);
+            let contest_ranks=await db_client.query("select user_id,username,countx from (select user_id,count(distinct(question_id)) as countx from submissions where score='Accepted' and contest_id=$1 group by user_id)inner_query inner join user_registeration on user_registeration.id=inner_query.user_id order by countx desc",[contest_id]);
+            if(contest_ranks.rows.length==0)throw exception;
+            else
+            {
+                res.render('leaderboard',{contest_ranks:contest_ranks.rows,contest_info:contest_info.rows[0]});
+            }
         }
     }
     catch(e){console.log(e);res.render('error404');}

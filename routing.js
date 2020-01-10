@@ -118,16 +118,18 @@ async function get_start_contest(req,res)
     {
         let user_info=req.cookies.user_info;
         let contest_id=req.params.contest_id;
-        let valid_user=await db_client.query("select user_id from contests_users where user_id=$1 and contest_id=$2",[user_info.id,contest_id]);
+        let valid_user=await db_client.query("select * from contests_users where user_id=$1 and contest_id=$2",[user_info.id,contest_id]);
         
-        if(valid_user.rows.length!=0)throw exception;//CHECK TIME TOKEN
+        
+        let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
+        contest_info=contest_info.rows[0];
+        
+        if(valid_user.rows.length!=0 && check_time(valid_user.rows[0].enter_time,contest_info.duration)){throw exception;}
         else
         {
             await db_client.query("begin");
             await db_client.query("insert into contests_users(user_id,contest_id,enter_time) values($1,$2,$3)",[user_info.id,contest_id,new Date()]);
-            
-            let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
-            contest_info=contest_info.rows[0];
+
             let q_ids_query=await db_client.query("select question_id from contest_question where contest_id=$1",[contest_id]);
             let q_ids=[];
             for(let i=0;i<q_ids_query.rows.length;i++){q_ids.push(q_ids_query.rows[i].question_id);};
@@ -162,7 +164,7 @@ async function get_contest_question(req,res)
                 question_info=question_info.rows[0];
                 let contest_info=await db_client.query("select * from live_contests where id=$1",[contest_id]);
                 contest_info=contest_info.rows[0];
-                res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:{}});
+                res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:" "});
             }
         }
     }
@@ -186,7 +188,7 @@ async function post_contest_question(req,res)
             let test_case=await db_client.query("select * from question_input_output where question_id=$1",[question_id]);
             let input=test_case.rows[0].input;
             let output=test_case.rows[0].output;
-            let compiler={source_code:source_code,std_in:input,expected_output:output,language_id:48};
+            let compiler={source_code:source_code,stdin:input,expected_output:output,language_id:48};
 
             let question_info=await db_client.query("select * from questions_table where id=$1",[question_id]);
             question_info=question_info.rows[0];
@@ -201,7 +203,7 @@ async function post_contest_question(req,res)
                 data:compiler
             })
             .then
-            (function(response)
+            (async function(response)
             {
                 axios
                 ({
@@ -209,10 +211,22 @@ async function post_contest_question(req,res)
                     url:'https://api.judge0.com/submissions/'+response.data.token,
                 })
                 .then
-                (function(response)
+                (async function(response)
                 {
                     let result=response.data.status.description;
-                    res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:result})
+                    if(result)
+                    {
+                        db_client.query("insert into leaderboard(user_id,contest_id,question_id,score) values($1,$2,$3,$4)",[user_info.id,contest_id,question_id,result],function(db_err,db_res)
+                        {
+                            if(db_err)res.render('error404');
+                            else
+                            {
+                                db_client.query("commit");
+                                res.render('single_question',{user_info:user_info,contest_info:contest_info,question_info:question_info,result:result})
+                            }
+                        });
+
+                    }
                 })
                 .catch
                 (error =>
@@ -230,7 +244,12 @@ async function post_contest_question(req,res)
     catch(e){res.render('error404');}
 }
 
-
+function check_time(user_time,contest_duration)
+{
+    let diff=(Date.now()-user_time)/(1000*60*60);
+    if(diff>contest_duration-10)return true;
+    return false;
+}
 
 function get_logout(req,res)
 {

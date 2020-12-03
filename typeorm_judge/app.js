@@ -5,6 +5,7 @@ const bodyParser=require('body-parser');
 const routing=require('./routing.js');
 const session = require('express-session');
 const cookie_parser=require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 main();
 
@@ -20,14 +21,27 @@ function app_init()
    app.use(express.static('public'));
    app.set('views',path);
    app.set('view engine','pug');
-   app.listen(3000, function () {  console.log("Server listening.")  }); 
+   app.listen(4000, function () {  console.log("Server listening.")  }); 
    app.use(cookie_parser());
 }
 
 function check_login(req,res)
 {
-   if(req.cookies.user_info)return true;
-   return false;
+   // console.log(req.headers);
+   if(req.cookies.user_info)
+   {
+      console.log(req.cookies.user_info);let flag=false;
+      jwt.verify(req.cookies.user_info.jwt_token,'admin_sid',function(err,decoded){
+         if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      console.log(decoded);
+      // res.status(200).send(decoded);
+      console.log("decoded");
+      flag=true;
+      })
+      return flag;
+    }
+
+      return false;
 }
 
 function app_route()
@@ -136,3 +150,5 @@ function app_route()
 
 
 
+// C:\Users\HP\Desktop\typeorm_judge\typeorm_judge\app.js
+// C:\Users\HP\Desktop\typeorm_judge\typeorm_judge\routing.js

@@ -1,10 +1,12 @@
 const path=require('path').join(__dirname+'/views/');
 const pg=require('pg');
-const database_connection_info = "postgres://admin_rajat:sql_root@localhost:5432/temp_online_judge";
+const database_connection_info = "postgres://postgres:13579@localhost:5432/demo";;
 const db_client= new pg.Client(database_connection_info);
 const jwt = require('jsonwebtoken');
-const jwt_secret_key='admin_rajat';
+const jwt_secret_key='admin_sid';
 const axios=require('axios');
+var bcrypt = require('bcryptjs');
+var salt =bcrypt.genSalt(8);
 
 db_client.connect();
 
@@ -26,60 +28,77 @@ module.exports=
 
 function get_signup(req,res){res.render('signup',{errors:{}});}
 
-function post_signup(req,res)
+async function post_signup(req,res)
 {
     let username=req.body.username;
     let password=req.body.password;
+    var salt =await bcrypt.genSalt(8);
+    console.log(salt);
+    var hashedPassword = bcrypt.hashSync(password, salt);
     let errors=[];
+
+    // const registered_users = await getManager()
+    // .createQueryBuilder(username, "user_registeration")
+    // .where("user_registeration.id = :id", { id: 1 });
+    // console.log(registered_users);
+    
 
     db_client.query("select * from user_registeration where username=$1",[username],function(db_err,db_res)
     {
-        if(db_err){res.render('error404');}
+        if(db_err){console.log("helloooo");res.render('error404');}
         else
         {
             if(db_res.rows.length>0)errors.push({error:'Username Already Taken!.'}); 
             if(errors.length==0)
             {
-                db_client.query("insert into user_registeration(username,password) values($1,$2)",[username,password],function(db_err,db_res)
+                db_client.query("insert into user_registeration(username,password) values($1,$2)",[username,hashedPassword],function(db_err,db_res)
                 {
                     if(db_err)res.render('error404');   
                     else res.redirect('/login');
                 });
             }
-            else res.render('signup',{errors:errors});
+            else{
+                console.log("hello");
+                 res.render('signup.pug',{errors:errors});
+            }
         }
     });
 }
 
 function get_login(req, res) {res.render('login',{errors:{}});}
 
-function post_login(req,res)
+async function post_login(req,res)
 {
+    console.log(req.body);
     let username=req.body.username;
     let password=req.body.password;
-    errors=[]
-    db_client.query("select * from user_registeration where username=$1 and password=$2",[username,password],function(db_err,db_res)
+    
+    let errors=[];let isValid;
+     db_client.query("select * from user_registeration where username=$1",[username],function(db_err,db_res)
     {
         if(db_err)res.render('error404');
         else
         {
-            if(db_res.rows.length!=1)
-            {
-                errors.push({error:'Invalid Credentials!.'});
-                res.render('login',errors);
+                let i,count=0;
+                for(i=0;i<db_res.rows.length;i++){
+                    let hpassword=db_res.rows[i].password;
+                    console.log(hpassword);
+                     isValid= bcrypt.compareSync(password,hpassword);
+                    if(isValid){count++;}
+                    console.log(count);
+                    if(count===0 || count>1){errors.push({error:'Invalid Credentials!.'}); res.send("INVALID CREDENTIALS");}
+                    else{
+                        let id=db_res.rows[0].id;
+                        let jwt_token=jwt.sign({username:username},jwt_secret_key);
+                        let user_info={id:id,username:username,jwt_token:jwt_token}
+                        console.log(jwt_token);
+                        res.cookie('user_info',user_info);
+                        res.send("LOGGED IN");
+                        // res.redirect('/livecontests');
+                    }
+                }
             }
-            else 
-            {
-                let id=db_res.rows[0].id;
-                let jwt_token=jwt.sign({username:username},jwt_secret_key);
-                let user_info={id:id,username:username,jwt_token:jwt_token}
-                res.cookie('user_info',user_info);
-                res.redirect('/livecontests');
-            }
-        }
-        
-    });
-    
+        });
 }
 
 function get_livecontests(req,res)
@@ -304,6 +323,7 @@ function check_time(user_time,contest_duration)
 
 function get_logout(req,res)
 {
+    console.log("in logout");
     res.clearCookie('user_info');
     res.redirect('/login');
 }
@@ -311,20 +331,20 @@ function get_logout(req,res)
         
     
 
-// async function get_contest_q1()
-// {
-//     return new Promise((resolve, reject) => {
-//         let res={};
-//     db_client.query("select * from user_registeration",function(db_err,db_res)
-//     {
-//         if(!db_err)
-//         {
-//             console.log('Here');
-//             res=db_res.rows;
-//             resolve(res);
-//         } else {
-//             reject(db_err);
-//         }
-//     });
-//     });
-// }
+async function get_contest_q1()
+{
+    return new Promise((resolve, reject) => {
+        let res={};
+    db_client.query("select * from user_registeration",function(db_err,db_res)
+    {
+        if(!db_err)
+        {
+            console.log('Here');
+            res=db_res.rows;
+            resolve(res);
+        } else {
+            reject(db_err);
+        }
+    });
+    });
+}

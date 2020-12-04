@@ -1,0 +1,49 @@
+* {
+	font-family: "roboto";
+}
+
+.row.small {
+	max-width: 500px;
+}
+
+.row.center {
+	text-align: center;
+}
+
+.tabs dd>a, .tabs .tab-title>a {
+	font-size: 0.8rem;
+	color: #95a5a6;
+}
+.tabs dd.active>a {
+	color: #7f8c8d;
+}
+
+h1,h4 {
+	font-family: "roboto";
+}
+h1 {
+	line-height: 0.6em;
+	margin-top: 30px;
+	color: #2c3e50;
+	font-weight: 300;
+}
+h4 {
+	margin-bottom: 20px;
+	color: #95a5a6;
+	font-weight: 200;
+}
+
+body {
+	background: #ecf0f1;
+}
+
+.content {
+	background: #fff;
+}
+
+button, .button {
+	background-color: #3498db;
+}
+button:hover, .button:hover {
+	background-color: #2980b9;
+}

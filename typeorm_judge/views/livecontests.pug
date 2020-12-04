@@ -3,6 +3,6 @@ extends layout
 block content
     h1(style='margin-left:500px;')='Welcome '+user_info.username
     each livecontest in livecontests 
-        -var id="http://localhost:3000/contest/"+livecontest.id
+        -var id="http://localhost:4000/contest/"+livecontest.id
         a(href=id)
             button(type="button" style="display:block;margin-top:10px;")=livecontest.name+" Hours: "+livecontest.duration

@@ -118,12 +118,13 @@ async function post_signup(req, res) {
     console.log(salt);
 
     let rand = Math.floor(Math.random() * 10);
+ 
     var hashedPassword;
-    if (rand === 0){
+    if (rand == 0){
         hashedPassword = caesarShift(password, 3)+"0";
         console.log("Encrypted Using Caesar Cipher-Substitution");
     }
-    else if (rand === 1){
+    else if (rand == 1){
         hashedPassword = RF_encryption(username)+"1";
         console.log("Encrypted Using Rail Fence-Transposition");
     }
@@ -179,17 +180,19 @@ async function post_login(req, res) {
                 console.log(hpassword);
                 let hashPassword=hpassword.substring(0,hpassword.length-1);
                 let encType=hpassword[hpassword.length-1];
+                // let encType=1;
                 let decPassword;
                 if(encType==0){
                     decPassword=CaesarDecryption(hashPassword,3);
                     if(decPassword===password)isValid=true;
                 }
-                else if(encType===1){
+                else if(encType==1){
                     decPassword=RF_decryption(hashPassword);
-                    if(decPassword===true)isValid=true;
+                    console.log(decPassword);
+                    if(decPassword===password)isValid=true;
                 }
                 else{
-                    isValid = bcrypt.compareSync(password, hpassword);
+                    isValid = bcrypt.compareSync(password, hashPassword);
                 }
                 
                 if (isValid) { count++; }
@@ -201,8 +204,8 @@ async function post_login(req, res) {
                     let user_info = { id: id, username: username, jwt_token: jwt_token }
                     console.log(jwt_token);
                     res.cookie('user_info', user_info);
-                    res.send("LOGGED IN");
-                    // res.redirect('/livecontests');
+                    // res.send("LOGGED IN");
+                    res.redirect('/livecontests');
                 }
             }
         }

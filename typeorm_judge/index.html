@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+		<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Roboto:100,100italic,200,300,400,400italic,700%7COpen+Sans:300italic,400,300,700'>
+		<link rel="stylesheet" type="text/css" href="./css/foundation.min.css" />
+		<link rel="stylesheet" type="text/css" href="./css/style.css" />
+
+		<title>Diffie Hellman Implementation</title>
+	</head>
+	<body>
+		<div class="row small center">
+			<h1>Diffie Hellman</h1>
+			<h4>Implementation</h4>
+		</div>
+		<div class="row small">
+			<dl class="tabs" data-tab>
+			  	<dd class="active"><a href="#generate-shared-key">Get Public Key</a></dd>
+			  	<dd><a href="#generate-secret-key">Get Shared Secret</a></dd>
+			  	<dd><a href="#bruteforce">Crypta Analysis</a></dd>
+			</dl>
+		</div>
+		<div class="tabs-content">
+		  	<div class="content active" id="generate-shared-key">
+		    	<div class="row small">
+				    <div class="large-4 columns">
+				      	<label>Prime
+				        	<input type="number" placeholder="" id="shared-prime" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-4 columns">
+				      	<label>Base
+				       		<input type="number" placeholder="" id="shared-base" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-4 columns">
+				      	<label>Integer
+				        	<input type="number" placeholder="" id="shared-integer" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				</div>
+				<div class="row small">
+				    <div class="large-12 columns">
+				      	<label>Public key
+				      		<input type="number" placeholder="" id="shared-key" disabled="true" />
+				      	</label>
+				    </div>
+				</div>
+		  	</div>
+		  	<div class="content" id="generate-secret-key">
+		    	<div class="row small">
+				    <div class="large-4 columns">
+				      	<label>Prime
+				        	<input type="number" placeholder="" id="secret-prime" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-4 columns">
+				      	<label>Integer
+				       		<input type="number" placeholder="" id="secret-integer" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-4 columns">
+				      	<label>Public Key Pair
+				        	<input type="number" placeholder="" id="secret-shared" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				</div>
+				<div class="row small">
+				    <div class="large-12 columns">
+				      	<label>Secret key
+				      		<input type="number" placeholder="" id="secret-key" disabled="true" />
+				      	</label>
+				    </div>
+				</div>
+		  	</div>
+		  	<div class="content" id="bruteforce">
+		    	<div class="row small">
+				    <div class="large-3 columns">
+				      	<label>Prime
+				        	<input type="number" placeholder="" id="bruteforce-prime" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-3 columns">
+				      	<label>Base
+				       		<input type="number" placeholder="" id="bruteforce-base" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-3 columns">
+				      	<label>Public Key A
+				        	<input type="number" placeholder="" id="bruteforce-shared-a" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				    <div class="large-3 columns">
+				      	<label>Public Key B
+				        	<input type="number" placeholder="" id="bruteforce-shared-b" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+				      	</label>
+				    </div>
+				</div>
+				<div class="row small">
+				    <div class="large-6 columns">
+				      	<label>Integer A
+				      		<input type="number" placeholder="" id="bruteforce-integer-a" disabled="true" />
+				      	</label>
+				    </div>
+				    <div class="large-6 columns">
+				      	<label>Integer B
+				      		<input type="number" placeholder="" id="bruteforce-integer-b" disabled="true" />
+				      	</label>
+				    </div>
+				</div>
+				<div class="row small">
+				    <div class="large-12 columns">
+				      	<label>Secret key
+				      		<input type="number" placeholder="" id="bruteforce-key" disabled="true" />
+				      	</label>
+				    </div>
+				</div>
+				<div class="row small">
+				    <div class="large-12 columns">
+						<a id="bruteforce-button" class="button expand">Bruteforce</a>
+					</div>
+				</div>
+		  	</div>
+		</div>
+			
+		<div class="row small center">
+		    <div class="large-12 columns">
+				<h6 class="subheader">Implemented by <b>SIDHANT GUPTA-11720049</b></h6>
+			</div>
+		</div>
+
+
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/foundation.min.js"></script>
+		<script src="js/diffie-hellman.js"></script>
+		<script src="js/apps.js"></script>
+	</body>
+</html>
+
